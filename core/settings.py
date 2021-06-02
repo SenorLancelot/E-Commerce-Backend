@@ -29,6 +29,9 @@ INSTALLED_APPS = [
     "mptt",
     "users",
     "rest_framework",
+    "djoser",
+    "rest_framework_swagger",
+    "rest_framework.authtoken",
 ]
 
 MIDDLEWARE = [
@@ -102,4 +105,7 @@ AUTH_USER_MODEL = "users.NewUser"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media/"
 
-REST_FRAMEWORK = {"DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"]}
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.TokenAuthentication",],
+}
