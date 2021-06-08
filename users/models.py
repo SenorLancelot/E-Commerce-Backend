@@ -51,3 +51,7 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.user_name
+
+    class Meta:
+        verbose_name = _("User")
+        verbose_name_plural = _("Users")

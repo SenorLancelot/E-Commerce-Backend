@@ -1,7 +1,9 @@
 from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
+from users.models import NewUser
 
 from .models import (
+    Cart,
     Category,
     Product,
     ProductImage,
@@ -11,6 +13,7 @@ from .models import (
 )
 
 admin.site.register(Category, MPTTModelAdmin)
+admin.site.register(Cart)
 
 
 class ProductSpecificationInline(admin.TabularInline):
@@ -38,3 +41,12 @@ class ProductAdmin(admin.ModelAdmin):
         ProductSpecificationValueInline,
         ProductImageInline,
     ]
+
+
+class CartInline(admin.TabularInline):
+    model = Cart
+
+
+@admin.register(NewUser)
+class UserAdmin(admin.ModelAdmin):
+    inlines = [CartInline]

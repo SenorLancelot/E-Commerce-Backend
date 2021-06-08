@@ -4,10 +4,12 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.db import models
+from django.db.models.signals import post_save
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
+from users.models import NewUser
 
 
 class Category(MPTTModel):
@@ -80,6 +82,7 @@ class Product(models.Model):
     title = models.CharField(verbose_name=_("title"), help_text=_("Required"), max_length=255,)
     description = models.TextField(verbose_name=_("description"), help_text=_("Not Required"), blank=True)
     slug = models.SlugField(max_length=255)
+    stock = models.IntegerField(default=0)
     regular_price = models.DecimalField(
         verbose_name=_("Regular price"),
         help_text=_("Maximum 999.99"),
@@ -158,4 +161,21 @@ class ProductImage(models.Model):
     class Meta:
         verbose_name = _("Product Image")
         verbose_name_plural = _("Product Images")
+
+
+class Cart(models.Model):
+
+    user = models.OneToOneField(NewUser, on_delete=models.CASCADE, primary_key=True,)
+    products = models.ManyToManyField(Product)
+
+    class Meta:
+        verbose_name = _("Cart")
+        verbose_name_plural = _("Carts")
+
+
+def create_cart(sender, instance, created, **kwargs):
+    if created:
+        Cart.objects.create(user=instance)
+
+post_save.connect(create_cart, sender=NewUser)
 
