@@ -33,6 +33,8 @@ INSTALLED_APPS = [
     "rest_framework_swagger",
     "rest_framework.authtoken",
     "drf_yasg",
+    "drf_instamojo",
+    "drfaddons",
 ]
 
 MIDDLEWARE = [
