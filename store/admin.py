@@ -5,6 +5,7 @@ from users.models import NewUser
 from .models import (
     Cart,
     Category,
+    Order,
     Product,
     ProductImage,
     ProductSpecification,
@@ -14,6 +15,7 @@ from .models import (
 
 admin.site.register(Category, MPTTModelAdmin)
 admin.site.register(Cart)
+admin.site.register(Order)
 
 
 class ProductSpecificationInline(admin.TabularInline):

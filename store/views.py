@@ -77,9 +77,18 @@ class CartView(APIView):
     def post(self, request, *args, **kwargs):
 
         productid = request.GET.get("productid", "")
+        # quantity = request.GET.get("quantity", "1")
         userid = self.kwargs["pk"]
 
         cart = Cart.objects.get(user=userid)
-        cart.products.add(productid)
+        product = models.Product.objects.get(productid=productid)
+        cart.products.add(product)
         cart.save()
         return Response(data=productid, status=status.HTTP_200_OK)
+
+    def delete(self, request, *args, **kwargs):
+        userid = self.kwargs["pk"]
+        productid = request.GET.get("productid", "")
+        cart = Cart.objects.get(user=userid)
+        cart.products.remove(models.Product.objects.get(productid=productid))
+        return Response(data=request.data, status=status.HTTP_200_OK)

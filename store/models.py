@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -80,6 +82,7 @@ class Product(models.Model):
     The Product table contining all product items.
     """
 
+    productid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     product_type = models.ForeignKey(ProductType, on_delete=models.RESTRICT)
     category = models.ForeignKey(Category, on_delete=models.RESTRICT)
     title = models.CharField(
@@ -199,9 +202,35 @@ class Cart(models.Model):
         verbose_name_plural = _("Carts")
 
 
+# class Cart_membership(models.Model):
+#     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+#     quantity = models.IntegerField(default=1)
+
+
 def create_cart(sender, instance, created, **kwargs):
     if created:
         Cart.objects.create(user=instance)
 
 
 post_save.connect(create_cart, sender=NewUser)
+
+
+class Order(models.Model):
+
+    user = models.OneToOneField(
+        NewUser,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    products = models.ManyToManyField(Product)
+    totalcost = models.DecimalField(max_digits=7, decimal_places=2)
+    payment = (
+        ("COD", "COD"),
+        ("OnlinePayment", "OnlinePayment"),
+    )
+    payment_type = models.CharField(max_length=100, choices=payment, default="COD")
+
+    class Meta:
+        verbose_name = _("Order")
+        verbose_name_plural = _("Orders")

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Cart, Category, Product, ProductImage
+from .models import Cart, Category, Order, Product, ProductImage
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            "id",
+            "productid",
             "category",
             "product_type",
             "title",
@@ -39,7 +39,7 @@ class ProductSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            "id",
+            "productid",
             "category",
             "product_type",
             "title",
@@ -63,3 +63,9 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ["products"]
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ["user", "products", "payment_type", "totalcost"]
