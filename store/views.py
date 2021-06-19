@@ -8,10 +8,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from . import models
-from .models import Cart, Category, Product
+from .models import Cart, Cart_membership, Category, Order, Product
 from .serializers import (
     CartSerializer,
     CategorySerializer,
+    OrderSerializer,
     ProductSerializer,
     ProductSerializerResponse,
 )
@@ -77,13 +78,15 @@ class CartView(APIView):
     def post(self, request, *args, **kwargs):
 
         productid = request.GET.get("productid", "")
-        # quantity = request.GET.get("quantity", "1")
+        quantity = request.GET.get("quantity", "1")
         userid = self.kwargs["pk"]
 
         cart = Cart.objects.get(user=userid)
         product = models.Product.objects.get(productid=productid)
-        cart.products.add(product)
-        cart.save()
+        # price = product.discount_price * quantity
+        cart_membership = Cart_membership(cart=cart, product=product, quantity=quantity)
+
+        cart_membership.save()
         return Response(data=productid, status=status.HTTP_200_OK)
 
     def delete(self, request, *args, **kwargs):
@@ -92,3 +95,25 @@ class CartView(APIView):
         cart = Cart.objects.get(user=userid)
         cart.products.remove(models.Product.objects.get(productid=productid))
         return Response(data=request.data, status=status.HTTP_200_OK)
+
+
+# class OrderView(APIView):
+#     serializer_class = OrderSerializer
+#     queryset = Order.objects.all()
+
+#     def post(self, request, *args, **kwargs):
+
+#         userid = self.kwargs["pk"]
+#         cart = Cart.objects.get(user=userid)
+
+#         totalcost = 0
+
+#         for product in cart.products.all():
+
+#             cart_membership = Cart_membership.objects.get(product=product)
+
+#             totalcost = totalcost + cart_membership.price
+
+#         print(cart.products.all())
+
+#         return Response(data=request.data, status=status.HTTP_200_OK)

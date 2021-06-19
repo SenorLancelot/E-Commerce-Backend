@@ -195,17 +195,18 @@ class Cart(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
-    products = models.ManyToManyField(Product)
+    products = models.ManyToManyField(Product, through="Cart_membership")
 
     class Meta:
         verbose_name = _("Cart")
         verbose_name_plural = _("Carts")
 
 
-# class Cart_membership(models.Model):
-#     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-#     quantity = models.IntegerField(default=1)
+class Cart_membership(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+    # price = models.DecimalField(max_digits=7, decimal_places=2)
 
 
 def create_cart(sender, instance, created, **kwargs):
