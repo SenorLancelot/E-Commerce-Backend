@@ -46,6 +46,8 @@ class ProductAdmin(admin.ModelAdmin):
         ProductImageInline,
     ]
 
+    list_display = ["title", "productid"]
+
 
 class CartInline(admin.TabularInline):
     model = Cart

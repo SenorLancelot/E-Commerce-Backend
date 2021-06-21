@@ -6,6 +6,7 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from users import models as usermodels
 
 from . import models
 from .models import Cart, Cart_membership, Category, Order, Product
@@ -83,8 +84,8 @@ class CartView(APIView):
 
         cart = Cart.objects.get(user=userid)
         product = models.Product.objects.get(productid=productid)
-        # price = product.discount_price * quantity
-        cart_membership = Cart_membership(cart=cart, product=product, quantity=quantity)
+        price = product.discount_price * int(quantity)
+        cart_membership = Cart_membership(cart=cart, product=product, quantity=quantity, price=price)
 
         cart_membership.save()
         return Response(data=productid, status=status.HTTP_200_OK)
@@ -97,23 +98,33 @@ class CartView(APIView):
         return Response(data=request.data, status=status.HTTP_200_OK)
 
 
-# class OrderView(APIView):
-#     serializer_class = OrderSerializer
-#     queryset = Order.objects.all()
+class OrderView(APIView):
+    serializer_class = OrderSerializer
+    queryset = Order.objects.all()
 
-#     def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
 
-#         userid = self.kwargs["pk"]
-#         cart = Cart.objects.get(user=userid)
+        userid = self.kwargs["pk"]
+        user = usermodels.NewUser.objects.get(id=userid)
+        payment_type = request.GET.get("payment_type", "COD")
+        cart = Cart.objects.get(user=userid)
 
-#         totalcost = 0
+        totalcost = 0
 
-#         for product in cart.products.all():
+        for product in cart.products.all():
 
-#             cart_membership = Cart_membership.objects.get(product=product)
+            cart_membership = Cart_membership.objects.get(product=product)
 
-#             totalcost = totalcost + cart_membership.price
+            totalcost = totalcost + cart_membership.price
 
-#         print(cart.products.all())
+        order = Order(user=user, totalcost=totalcost, payment_type=payment_type)
 
-#         return Response(data=request.data, status=status.HTTP_200_OK)
+        order.save()
+
+        for product in cart.products.all():
+
+            order.products.add(product)
+
+        order.save()
+
+        return Response(data=request.data, status=status.HTTP_200_OK)
